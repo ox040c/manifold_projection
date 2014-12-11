@@ -23,7 +23,7 @@ public class ManifoldProjection {
     private static float[] lightPosition = {-2.19f, 1.36f, 11.45f, 1f};
     private static int bunnyDisplayList;
 
-    private static final String MODEL_LOCATION = "res/models/untitled.obj";
+    private static final String MODEL_LOCATION = "res/models/cow_vn.obj";
 
     public static void main(String[] args) {
         setUpDisplay();
@@ -57,7 +57,7 @@ public class ManifoldProjection {
 
         bunnyDisplayList = OBJLoader.createTexturedDisplayList(m);
         glEnable(GL_TEXTURE_2D);
-        m.getMaterials().get("None").texture.bind();
+        m.getMaterials().get("cow_vn_mtl").texture.bind();
     }
 
     private static void checkInput() {
