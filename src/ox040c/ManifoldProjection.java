@@ -3,6 +3,7 @@ package ox040c;
 /**
  * Created by Yuanzhang on 10/21/2014.
  */
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -14,6 +15,7 @@ import utility.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -61,7 +63,8 @@ public class ManifoldProjection {
     }
 
     private static void checkInput() {
-        camera.processMouse(1, 80, -80);
+        // NOTE: camera direction now cannot be changed by mouse input
+        //camera.processMouse(1, 80, -80);
         camera.processKeyboard(16, 1, 1, 1);
         glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
         if (Keyboard.isKeyDown(Keyboard.KEY_G)) {
@@ -84,7 +87,18 @@ public class ManifoldProjection {
         glLoadIdentity();
         camera.applyTranslations();
 
-        glCallList(bunnyDisplayList);
+        eventHandler.classifyMouseEvent();
+        glPushMatrix();
+            glTranslatef(eventHandler.getTranslateX(), eventHandler.getTranslateY(), 0.0f);
+
+            glMultMatrix(conversionMatrix);
+        //printMatrix(conversionMatrix);
+            //glRotatef(eventHandler.getRotateX(), 1.0f, 0.0f, 0.0f);
+            //glRotatef(eventHandler.getRotateY(), 0.0f, 1.0f, 0.0f);
+            //glRotatef(eventHandler.getRotateZ(), 0.0f, 0.0f, 1.0f);
+
+            glCallList(bunnyDisplayList);
+        glPopMatrix();
     }
 
     private static void setUpLighting() {
@@ -105,6 +119,9 @@ public class ManifoldProjection {
                 .setPosition(-1.19f, 1.36f, 5.45f).setFieldOfView(70).build();
         camera.applyOptimalStates();
         camera.applyPerspectiveMatrix();
+
+        glLoadIdentity();
+        glGetFloat(GL_MODELVIEW_MATRIX,conversionMatrix);
     }
 
     private static void setUpDisplay() {
@@ -119,4 +136,79 @@ public class ManifoldProjection {
             System.exit(1);
         }
     }
+
+
+    static FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
+    static FloatBuffer conversionMatrix = BufferUtils.createFloatBuffer(16);
+
+    static private EventHandler eventHandler = new EventHandler() {
+
+        @Override
+        void onRightMouseUp() {
+
+        }
+
+        @Override
+        void onRightMouseMotion() {
+
+            translateX += Mouse.getDX() / 100.0f;
+            translateY += Mouse.getDY() / 100.0f;
+
+        }
+
+        @Override
+        void onRightMouseDown() {
+
+        }
+
+        @Override
+        void onLeftMouseUp() {
+
+        }
+
+        @Override
+        void onLeftMouseMotion() {
+
+            //rotateX += Mouse.getDX();
+            //rotateY += Mouse.getDY();
+
+            int vectorX = Mouse.getDX();
+            int vectorY = Mouse.getDY();
+            int vectorZ = 0;
+            int normalX = vectorY * 1 - 0 * vectorZ;
+            int normalY = vectorZ * 0 - 1 * vectorX;
+            int normalZ = 0;
+
+            float angle = (float) Math.sqrt((double) (vectorX * vectorX + vectorY * vectorY));
+
+            glPushMatrix();
+            glLoadIdentity();
+
+            glRotatef(angle, normalX, normalY, normalZ);
+
+            glGetFloat(GL_MODELVIEW_MATRIX, matrix);
+            glMultMatrix(conversionMatrix);
+            glGetFloat(GL_MODELVIEW_MATRIX, conversionMatrix);
+
+            glPopMatrix();
+
+
+        }
+
+        @Override
+        void onLeftMouseDown() {
+
+        }
+    };
+
+    static void printMatrix(FloatBuffer matrix) {
+        for (int i = 0; i != 4; ++i) {//i是列数
+            for (int j = 0; j != 4; ++j) {//j是行数
+                System.out.print(matrix.get(j * 4 + i) + " ");
+            }
+            System.out.println();
+        }
+        matrix.rewind();
+    }
+
 }

@@ -5,13 +5,36 @@ import org.lwjgl.input.Mouse;
 public abstract class EventHandler {
     int leftMouseDownTimes = 0;
     boolean isLeftMouseDown = false;
-    int lastLeftX = 0;
-    int lastLeftY = 0;
+
+    public float getTranslateX() {
+        return translateX;
+    }
+
+    public float getTranslateY() {
+        return translateY;
+    }
+
+    float translateX = 0;
+    float translateY = 0;
+
+    public float getRotateX() {
+        return rotateX;
+    }
+
+    public float getRotateZ() {
+        return rotateZ;
+    }
+
+    public float getRotateY() {
+        return rotateY;
+    }
+
+    float rotateX = 0;
+    float rotateY = 0;
+    float rotateZ = 0;
 
     int rightMouseDownTimes = 0;
     boolean isRightMouseDown = false;
-    int lastRightX = 0;
-    int lastRightY = 0;
 
     void classifyMouseEvent() {
         if (Mouse.isButtonDown(0)) {
@@ -23,12 +46,8 @@ public abstract class EventHandler {
                 else {
                     isLeftMouseDown = true;
                     onLeftMouseDown();
-                    lastLeftX = Mouse.getX();
-                    lastLeftY = Mouse.getY();
                 }
                 leftMouseDownTimes = 0;
-                lastLeftX = Mouse.getX();
-                lastLeftY = Mouse.getY();
             }
         } else if (isLeftMouseDown) {
             isLeftMouseDown = false;
@@ -47,8 +66,6 @@ public abstract class EventHandler {
                     onRightMouseDown();
                 }
                 rightMouseDownTimes = 0;
-                lastRightX = Mouse.getX();
-                lastRightY = Mouse.getY();
             }
         } else if (isRightMouseDown) {
             isRightMouseDown = false;

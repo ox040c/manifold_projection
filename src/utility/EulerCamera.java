@@ -170,24 +170,7 @@ public final class EulerCamera implements Camera {
 
     /** Processes mouse input and converts it in to camera movement. */
     public void processMouse() {
-        final float MAX_LOOK_UP = 90;
-        final float MAX_LOOK_DOWN = -90;
-        float mouseDX = Mouse.getDX() * 0.16f;
-        float mouseDY = Mouse.getDY() * 0.16f;
-        if (yaw + mouseDX >= 360) {
-            yaw = yaw + mouseDX - 360;
-        } else if (yaw + mouseDX < 0) {
-            yaw = 360 - yaw + mouseDX;
-        } else {
-            yaw += mouseDX;
-        }
-        if (pitch - mouseDY >= MAX_LOOK_DOWN && pitch - mouseDY <= MAX_LOOK_UP) {
-            pitch += -mouseDY;
-        } else if (pitch - mouseDY < MAX_LOOK_DOWN) {
-            pitch = MAX_LOOK_DOWN;
-        } else if (pitch - mouseDY > MAX_LOOK_UP) {
-            pitch = MAX_LOOK_UP;
-        }
+        processMouse(1.0f, -90.0f, 90.0f);
     }
 
     /**
@@ -196,24 +179,7 @@ public final class EulerCamera implements Camera {
      * @param mouseSpeed the speed (sensitivity) of the mouse, 1.0 should suffice
      */
     public void processMouse(float mouseSpeed) {
-        final float MAX_LOOK_UP = 90;
-        final float MAX_LOOK_DOWN = -90;
-        float mouseDX = Mouse.getDX() * mouseSpeed * 0.16f;
-        float mouseDY = Mouse.getDY() * mouseSpeed * 0.16f;
-        if (yaw + mouseDX >= 360) {
-            yaw = yaw + mouseDX - 360;
-        } else if (yaw + mouseDX < 0) {
-            yaw = 360 - yaw + mouseDX;
-        } else {
-            yaw += mouseDX;
-        }
-        if (pitch - mouseDY >= MAX_LOOK_DOWN && pitch - mouseDY <= MAX_LOOK_UP) {
-            pitch += -mouseDY;
-        } else if (pitch - mouseDY < MAX_LOOK_DOWN) {
-            pitch = MAX_LOOK_DOWN;
-        } else if (pitch - mouseDY > MAX_LOOK_UP) {
-            pitch = MAX_LOOK_UP;
-        }
+        processMouse(mouseSpeed, -90.0f, 90.0f);
     }
 
     /**
@@ -250,47 +216,7 @@ public final class EulerCamera implements Camera {
      * @throws IllegalArgumentException if delta is 0 or delta is smaller than 0
      */
     public void processKeyboard(float delta) {
-        if (delta <= 0) {
-            throw new IllegalArgumentException("delta " + delta + " is 0 or is smaller than 0");
-        }
-
-        boolean keyUp = Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W);
-        boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
-        boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
-        boolean keyRight = Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D);
-        boolean flyUp = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
-        boolean flyDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-
-        if (keyUp && keyRight && !keyLeft && !keyDown) {
-            moveFromLook(delta * 0.003f, 0, -delta * 0.003f);
-        }
-        if (keyUp && keyLeft && !keyRight && !keyDown) {
-            moveFromLook(-delta * 0.003f, 0, -delta * 0.003f);
-        }
-        if (keyUp && !keyLeft && !keyRight && !keyDown) {
-            moveFromLook(0, 0, -delta * 0.003f);
-        }
-        if (keyDown && keyLeft && !keyRight && !keyUp) {
-            moveFromLook(-delta * 0.003f, 0, delta * 0.003f);
-        }
-        if (keyDown && keyRight && !keyLeft && !keyUp) {
-            moveFromLook(delta * 0.003f, 0, delta * 0.003f);
-        }
-        if (keyDown && !keyUp && !keyLeft && !keyRight) {
-            moveFromLook(0, 0, delta * 0.003f);
-        }
-        if (keyLeft && !keyRight && !keyUp && !keyDown) {
-            moveFromLook(-delta * 0.003f, 0, 0);
-        }
-        if (keyRight && !keyLeft && !keyUp && !keyDown) {
-            moveFromLook(delta * 0.003f, 0, 0);
-        }
-        if (flyUp && !flyDown) {
-            y += delta * 0.003f;
-        }
-        if (flyDown && !flyUp) {
-            y -= delta * 0.003f;
-        }
+        processKeyboard(delta, 0.003f, 0.003f, 0.003f);
     }
 
     /**
@@ -302,47 +228,7 @@ public final class EulerCamera implements Camera {
      * @throws IllegalArgumentException if delta is 0 or delta is smaller than 0
      */
     public void processKeyboard(float delta, float speed) {
-        if (delta <= 0) {
-            throw new IllegalArgumentException("delta " + delta + " is 0 or is smaller than 0");
-        }
-
-        boolean keyUp = Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W);
-        boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
-        boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
-        boolean keyRight = Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D);
-        boolean flyUp = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
-        boolean flyDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-
-        if (keyUp && keyRight && !keyLeft && !keyDown) {
-            moveFromLook(speed * delta * 0.003f, 0, -speed * delta * 0.003f);
-        }
-        if (keyUp && keyLeft && !keyRight && !keyDown) {
-            moveFromLook(-speed * delta * 0.003f, 0, -speed * delta * 0.003f);
-        }
-        if (keyUp && !keyLeft && !keyRight && !keyDown) {
-            moveFromLook(0, 0, -speed * delta * 0.003f);
-        }
-        if (keyDown && keyLeft && !keyRight && !keyUp) {
-            moveFromLook(-speed * delta * 0.003f, 0, speed * delta * 0.003f);
-        }
-        if (keyDown && keyRight && !keyLeft && !keyUp) {
-            moveFromLook(speed * delta * 0.003f, 0, speed * delta * 0.003f);
-        }
-        if (keyDown && !keyUp && !keyLeft && !keyRight) {
-            moveFromLook(0, 0, speed * delta * 0.003f);
-        }
-        if (keyLeft && !keyRight && !keyUp && !keyDown) {
-            moveFromLook(-speed * delta * 0.003f, 0, 0);
-        }
-        if (keyRight && !keyLeft && !keyUp && !keyDown) {
-            moveFromLook(speed * delta * 0.003f, 0, 0);
-        }
-        if (flyUp && !flyDown) {
-            y += speed * delta * 0.003f;
-        }
-        if (flyDown && !flyUp) {
-            y -= speed * delta * 0.003f;
-        }
+        processKeyboard(delta, speed, speed, speed);
     }
 
     /**
@@ -360,41 +246,42 @@ public final class EulerCamera implements Camera {
             throw new IllegalArgumentException("delta " + delta + " is 0 or is smaller than 0");
         }
 
-        boolean keyUp = Keyboard.isKeyDown(Keyboard.KEY_UP) || Keyboard.isKeyDown(Keyboard.KEY_W);
-        boolean keyDown = Keyboard.isKeyDown(Keyboard.KEY_DOWN) || Keyboard.isKeyDown(Keyboard.KEY_S);
-        boolean keyLeft = Keyboard.isKeyDown(Keyboard.KEY_LEFT) || Keyboard.isKeyDown(Keyboard.KEY_A);
+        // NOTE: modified up and down behavior to zoom in and out
+        boolean zoomIn   = Keyboard.isKeyDown(Keyboard.KEY_Q);
+        boolean zoomOut  = Keyboard.isKeyDown(Keyboard.KEY_E);
+        boolean keyLeft  = Keyboard.isKeyDown(Keyboard.KEY_LEFT)  || Keyboard.isKeyDown(Keyboard.KEY_A);
         boolean keyRight = Keyboard.isKeyDown(Keyboard.KEY_RIGHT) || Keyboard.isKeyDown(Keyboard.KEY_D);
-        boolean flyUp = Keyboard.isKeyDown(Keyboard.KEY_SPACE);
-        boolean flyDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+        boolean keyUp    = Keyboard.isKeyDown(Keyboard.KEY_UP)    || Keyboard.isKeyDown(Keyboard.KEY_W);
+        boolean keyDown  = Keyboard.isKeyDown(Keyboard.KEY_DOWN)  || Keyboard.isKeyDown(Keyboard.KEY_S);
 
-        if (keyUp && keyRight && !keyLeft && !keyDown) {
+        if (zoomIn && keyRight && !keyLeft && !zoomOut) {
             moveFromLook(speedX * delta * 0.003f, 0, -speedZ * delta * 0.003f);
         }
-        if (keyUp && keyLeft && !keyRight && !keyDown) {
+        if (zoomIn && keyLeft && !keyRight && !zoomOut) {
             moveFromLook(-speedX * delta * 0.003f, 0, -speedZ * delta * 0.003f);
         }
-        if (keyUp && !keyLeft && !keyRight && !keyDown) {
+        if (zoomIn && !keyLeft && !keyRight && !zoomOut) {
             moveFromLook(0, 0, -speedZ * delta * 0.003f);
         }
-        if (keyDown && keyLeft && !keyRight && !keyUp) {
+        if (zoomOut && keyLeft && !keyRight && !zoomIn) {
             moveFromLook(-speedX * delta * 0.003f, 0, speedZ * delta * 0.003f);
         }
-        if (keyDown && keyRight && !keyLeft && !keyUp) {
+        if (zoomOut && keyRight && !keyLeft && !zoomIn) {
             moveFromLook(speedX * delta * 0.003f, 0, speedZ * delta * 0.003f);
         }
-        if (keyDown && !keyUp && !keyLeft && !keyRight) {
+        if (zoomOut && !zoomIn && !keyLeft && !keyRight) {
             moveFromLook(0, 0, speedZ * delta * 0.003f);
         }
-        if (keyLeft && !keyRight && !keyUp && !keyDown) {
+        if (keyLeft && !keyRight && !zoomIn && !zoomOut) {
             moveFromLook(-speedX * delta * 0.003f, 0, 0);
         }
-        if (keyRight && !keyLeft && !keyUp && !keyDown) {
+        if (keyRight && !keyLeft && !zoomIn && !zoomOut) {
             moveFromLook(speedX * delta * 0.003f, 0, 0);
         }
-        if (flyUp && !flyDown) {
+        if (keyUp && !keyDown) {
             y += speedY * delta * 0.003f;
         }
-        if (flyDown && !flyUp) {
+        if (keyDown && !keyUp) {
             y -= speedY * delta * 0.003f;
         }
     }
