@@ -1,3 +1,5 @@
+package ox040c;
+
 import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.image.BufferedImage;
@@ -16,7 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
-import javax.swing.JTable.PrintMode;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -25,15 +26,19 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 public class ReBuild {
-    ArrayList<Short[]> indiciesArrayList = new ArrayList<Short[]>();
+    ArrayList<Short[]> indicesArrayList = new ArrayList<Short[]>();
     ArrayList<Float[]> verticesArrayList = new ArrayList<Float[]>();
     ArrayList<Float[]> veinArrayList = new ArrayList<Float[]>();
     ByteBuffer byteBuffer = null;
 
+    public static void main(String[] args) {
+        new ReBuild().execute();
+    }
+
     public ReBuild() {
-        // TODO Auto-generated constructor stub
+
         try {
-            FileInputStream inputStream = new FileInputStream("Cow_dABF.obj");
+            FileInputStream inputStream = new FileInputStream("res/models/cow_vn.obj");
             Scanner in = new Scanner(inputStream);
             while (in.hasNext()) {
                 String line = in.nextLine().trim();
@@ -82,7 +87,7 @@ public class ReBuild {
                         //System.out.print(shorts[i] + " ");
                         ++i;
                     }
-                    indiciesArrayList.add(shorts);
+                    indicesArrayList.add(shorts);
                     //System.out.println();
                     continue;
                 }
@@ -113,10 +118,10 @@ public class ReBuild {
         glColor3f(1, 1, 1);
         glBegin(GL_TRIANGLES);
 
-        for (int i = 0; i < indiciesArrayList.size(); i++) {
+        for (int i = 0; i < indicesArrayList.size(); i++) {
             for (int j = 0; j < 3; j++) {
-                int vi = indiciesArrayList.get(i)[2 * j];
-                int ni = indiciesArrayList.get(i)[2 * j + 1];
+                int vi = indicesArrayList.get(i)[2 * j];
+                int ni = indicesArrayList.get(i)[2 * j + 1];
                 float f1, f2, f3;
 
                 float glScale = 1.0f;
@@ -152,7 +157,7 @@ public class ReBuild {
         InputStream imageStream;
         BufferedImage bufferImage = null;
         try {
-            imageStream = new FileInputStream("texture2.bmp");
+            imageStream = new FileInputStream("res/models/texture2.bmp");
             bufferImage = ImageIO.read(imageStream);
         } catch (IOException e) {
             e.printStackTrace();
@@ -178,13 +183,13 @@ public class ReBuild {
         glPushMatrix();
         glGetFloat(GL_MODELVIEW_MATRIX, originMatrix);
 
-        glGetFloat(GL_MODELVIEW_MATRIX, converseMatrix);
+        glGetFloat(GL_MODELVIEW_MATRIX, conversionMatrix);
 
         while (!Display.isCloseRequested()) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glEnable(GL_DEPTH_TEST);
             glPopMatrix();
-            eventHandler.clasifyMouseEvent();
+            eventHandler.classifyMouseEvent();
             glPushMatrix();
 
             drawModel();
@@ -208,7 +213,7 @@ public class ReBuild {
 
     FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
     FloatBuffer originMatrix = BufferUtils.createFloatBuffer(16);
-    FloatBuffer converseMatrix = BufferUtils.createFloatBuffer(16);
+    FloatBuffer conversionMatrix = BufferUtils.createFloatBuffer(16);
     boolean isRotated = false;
 
     public FloatBuffer getInverseMatrix(FloatBuffer m) {
@@ -336,54 +341,44 @@ public class ReBuild {
         return inv;
     }
 
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        new ReBuild().execute();
-    }
-
     private EventHandler eventHandler = new EventHandler() {
 
         @Override
         void onRightMouseUp() {
-            // TODO Auto-generated method stub
+
         }
 
         @Override
         void onRightMouseMotion() {
-            // TODO Auto-generated method stub
-            int curX = Mouse.getX();
-            int curY = Mouse.getY();
-            int vectorX = curX - lastRightX;
-            int vectorY = curY - lastRightY;
+
+            int vectorX = Mouse.getDX();
+            int vectorY = Mouse.getDY();
             int vectorZ = 0;
             glLoadIdentity();
             glTranslatef(vectorX / 200.0f, vectorY / 200.0f, vectorZ);
             glGetFloat(GL_MODELVIEW_MATRIX, matrix);
             glMultMatrix(originMatrix);
 
-            glMultMatrix(converseMatrix);
+            glMultMatrix(conversionMatrix);
 
-            converseMatrix = mulMatrix(matrix, converseMatrix);
+            conversionMatrix = mulMatrix(matrix, conversionMatrix);
         }
 
         @Override
         void onRightMouseDown() {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         void onLeftMouseUp() {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         void onLeftMouseMotion() {
-            int curX = Mouse.getX();
-            int curY = Mouse.getY();
-            int vectorX = curX - lastLeftX;
-            int vectorY = curY - lastLeftY;
+
+            int vectorX = Mouse.getDX();
+            int vectorY = Mouse.getDY();
             int vectorZ = 0;
             int normalX = vectorY * 1 - 0 * vectorZ;
             int normalY = vectorZ * 0 - 1 * vectorX;
@@ -395,20 +390,19 @@ public class ReBuild {
             glGetFloat(GL_MODELVIEW_MATRIX, matrix);
             glMultMatrix(originMatrix);
 
-            glMultMatrix(converseMatrix);
+            glMultMatrix(conversionMatrix);
 
-            converseMatrix = mulMatrix(matrix, converseMatrix);
+            conversionMatrix = mulMatrix(matrix, conversionMatrix);
 
         }
 
         @Override
         void onLeftMouseDown() {
-            // TODO Auto-generated method stub
 
         }
     };
 
-    FloatBuffer mulMatrix(FloatBuffer m1, FloatBuffer m2) {
+    static FloatBuffer mulMatrix(FloatBuffer m1, FloatBuffer m2) {
         FloatBuffer m = BufferUtils.createFloatBuffer(16);
         for (int i = 0; i != 4; ++i) {
             for (int j = 0; j != 4; ++j) {

@@ -1,5 +1,6 @@
-import org.lwjgl.input.Mouse;
+package ox040c;
 
+import org.lwjgl.input.Mouse;
 
 public abstract class EventHandler {
     int leftMouseDownTimes = 0;
@@ -12,7 +13,7 @@ public abstract class EventHandler {
     int lastRightX = 0;
     int lastRightY = 0;
 
-    void clasifyMouseEvent() {
+    void classifyMouseEvent() {
         if (Mouse.isButtonDown(0)) {
             //去掉连续的消息，每两次按键算作一次
             ++leftMouseDownTimes;
