@@ -92,10 +92,10 @@ public class ManifoldProjection {
             glTranslatef(eventHandler.getTranslateX(), eventHandler.getTranslateY(), 0.0f);
 
             glMultMatrix(conversionMatrix);
-        //printMatrix(conversionMatrix);
-            //glRotatef(eventHandler.getRotateX(), 1.0f, 0.0f, 0.0f);
-            //glRotatef(eventHandler.getRotateY(), 0.0f, 1.0f, 0.0f);
-            //glRotatef(eventHandler.getRotateZ(), 0.0f, 0.0f, 1.0f);
+
+            glRotatef(eventHandler.getRotateX(), 1.0f, 0.0f, 0.0f);
+            glRotatef(eventHandler.getRotateY(), 0.0f, 1.0f, 0.0f);
+            glRotatef(eventHandler.getRotateZ(), 0.0f, 0.0f, 1.0f);
 
             glCallList(bunnyDisplayList);
         glPopMatrix();
@@ -121,7 +121,7 @@ public class ManifoldProjection {
         camera.applyPerspectiveMatrix();
 
         glLoadIdentity();
-        glGetFloat(GL_MODELVIEW_MATRIX,conversionMatrix);
+        glGetFloat(GL_MODELVIEW_MATRIX, conversionMatrix);
     }
 
     private static void setUpDisplay() {
@@ -192,23 +192,17 @@ public class ManifoldProjection {
 
             glPopMatrix();
 
-
         }
 
         @Override
         void onLeftMouseDown() {
 
         }
-    };
 
-    static void printMatrix(FloatBuffer matrix) {
-        for (int i = 0; i != 4; ++i) {//i是列数
-            for (int j = 0; j != 4; ++j) {//j是行数
-                System.out.print(matrix.get(j * 4 + i) + " ");
-            }
-            System.out.println();
+        @Override
+        void processKeyboard() {
+
         }
-        matrix.rewind();
-    }
+    };
 
 }

@@ -1,6 +1,7 @@
 package ox040c;
 
 import org.lwjgl.input.Mouse;
+import org.lwjgl.input.Keyboard;
 
 public abstract class EventHandler {
     int leftMouseDownTimes = 0;
@@ -85,4 +86,6 @@ public abstract class EventHandler {
     abstract void onRightMouseUp();
 
     abstract void onRightMouseMotion();
+
+    abstract void processKeyboard();
 }
